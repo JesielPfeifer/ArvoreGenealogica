@@ -1,7 +1,9 @@
 #include "ArvoreGenealogica.h"
 
 int main() {
-    int opcao;
+    string nomePai, nomeMae, nomeFilho, sexoFilho;
+    int idadeFilho, opcao;
+    Pessoa *pessoa = new Pessoa();
     while(1) {
         cout << "====================MENU====================="<<endl;
         cout << "\n";
@@ -17,8 +19,36 @@ int main() {
         cout << "=============================================" << endl;
         cout << "Escolha uma opcao: ";
         cin >> opcao;
-        switch(opcao) {}
+        switch(opcao) {
+        case 1:
+            cout << "================PREENCHA OS DADOS================="<<endl;
+            cout << "\n";
+            cout << "Informe o nome do pai: ";
+            cin >> getline(cin,nomePai);
+            cout >> "Informe o nome da mae: ";
+            cin >> getline(cin,nomeMae);
+            cout << "Informe o nome do filho: ";
+            cin >> getline(cin, nomeFilho);
+            cout << "Informe o sexo do filho: ";
+            cin >> getline(cin,sexoFilho);
+            cout << "Informe a idade do filho: ";
+            cin >> idadeFilho;
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
 
-
+        }
     }
 }
