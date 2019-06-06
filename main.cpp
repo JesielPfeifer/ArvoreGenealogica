@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -27,10 +28,10 @@ public:
         this->corOlhos = corOlhos;
     }
     Pessoa *geraPessoa(string nome, TSexo sexo, int idade, Pessoa *pai) {}
-    string getNome(){
+    string getNome() {
         return this->nome;
     }
-    string getSexoStr(){
+    string getSexoStr() {
     }
     string getCorOlhosStr();
     int getIdade() {
@@ -54,10 +55,10 @@ public:
     void setMae(Pessoa *mae) {
         this->mae = mae;
     }
-    Pessoa* getPai(){
+    Pessoa* getPai() {
 
     }
-    Pessoa* getMae(){
+    Pessoa* getMae() {
 
     }
     void imprimeDados();
@@ -68,15 +69,49 @@ class Arvore {
 private:
     vector <Pessoa*> pessoas;
 public:
-    void inserirPessoa();
-    void removerPessoa();
+    Arvore();
+
+    void inserirPessoa() {
+
+    }
+    void removerPessoa() {
+
+    }
 
 };
 
 int main() {
+    Arvore *arvore = new Arvore();
+    fstream arquivoBase;
+    arquivoBase.open("DadosPessoas.txt", fstream::in);
+    if(arquivoBase.is_open()) {
+        cout << "Arquivo abriu normalmente" << endl;
+        while(!(arquivoBase.eof())) {
+            string nome, sexo, corOlhos, nomePai, nomeMae;
+            int idade;
+            arquivoBase >> nome;
+            arquivoBase >> sexo;
+            arquivoBase >> idade;
+            arquivoBase >> corOlhos;
+            if(arquivoBase >> nomePai) {
+
+            }
+            arquivoBase >> nomeMae;
+
+            Pessoa *dados = new Pessoa(nome,sexo,idade,corOlhos, nomePai,nomeMae);
+            arvore->inserirPessoa(dados);
+        }
+
+    } else {
+        cout << "Erro" << endl;
+    }
+
     string nomePai, nomeMae, nomeFilho, sexoFilho;
     int idadeFilho, opcao;
-    Pessoa *pessoa = new Pessoa();
+    Pessoa *pessoa;
+
+
+
     while(1) {
         cout << "====================MENU====================="<<endl;
         cout << "\n";
