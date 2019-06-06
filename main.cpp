@@ -1,4 +1,77 @@
-#include "ArvoreGenealogica.h"
+#include <string>
+#include <iostream>
+#include <vector>
+#include <sstream>
+
+using namespace std;
+
+class Pessoa {
+private:
+    string nome;
+    enum TSexo {sxMasculino, sxFeminino};
+    TSexo sexo;
+    int idade;
+    enum TCorOlhos {coCastanho, coVerde, coAzul};
+    TCorOlhos corOlhos;
+    Pessoa *pai;
+    Pessoa *mae;
+public:
+    Pessoa() {}
+    ~Pessoa() {}
+    Pessoa(string nome, TSexo sexo, int idade, TCorOlhos corOlhos, Pessoa *pai, Pessoa *mae) {
+        this->nome = nome;
+        this->idade = idade;
+        this->sexo = sexo;
+        this->pai = pai;
+        this->mae = mae;
+        this->corOlhos = corOlhos;
+    }
+    Pessoa *geraPessoa(string nome, TSexo sexo, int idade, Pessoa *pai) {}
+    string getNome(){
+        return this->nome;
+    }
+    string getSexoStr(){
+    }
+    string getCorOlhosStr();
+    int getIdade() {
+        return this->idade;
+    }
+    void setNome(string nome) {
+        this->nome = nome;
+    }
+    void setSexo(TSexo sexo) {
+        this->sexo = sexo;
+    }
+    void setCorOlhos(TCorOlhos corOlhos) {
+        this->corOlhos = corOlhos;
+    }
+    void setIdade(int idade) {
+        this->idade = idade;
+    }
+    void setPai(Pessoa *pai) {
+        this->pai = pai;
+    }
+    void setMae(Pessoa *mae) {
+        this->mae = mae;
+    }
+    Pessoa* getPai(){
+
+    }
+    Pessoa* getMae(){
+
+    }
+    void imprimeDados();
+    string serializaPessoa();
+};
+
+class Arvore {
+private:
+    vector <Pessoa*> pessoas;
+public:
+    void inserirPessoa();
+    void removerPessoa();
+
+};
 
 int main() {
     string nomePai, nomeMae, nomeFilho, sexoFilho;
@@ -24,13 +97,13 @@ int main() {
             cout << "================PREENCHA OS DADOS================="<<endl;
             cout << "\n";
             cout << "Informe o nome do pai: ";
-            cin >> getline(cin,nomePai);
-            cout >> "Informe o nome da mae: ";
-            cin >> getline(cin,nomeMae);
+            cin >> nomePai;
+            cout << "Informe o nome da mae: ";
+            cin >> nomeMae;
             cout << "Informe o nome do filho: ";
-            cin >> getline(cin, nomeFilho);
+            cin >> nomeFilho;
             cout << "Informe o sexo do filho: ";
-            cin >> getline(cin,sexoFilho);
+            cin >> sexoFilho;
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             break;
@@ -48,6 +121,8 @@ int main() {
             break;
         case 8:
             break;
+        default:
+            cout << "Opcao invalida" << endl;
 
         }
     }
