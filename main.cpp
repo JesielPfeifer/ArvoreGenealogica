@@ -90,18 +90,36 @@ class Arvore {
 private:
     vector<Pessoa *> pessoa;
 public:
-    void lerArquivo(string arquivo) {
+    void lerArquivo(string arquivo, string nomePaiDigitado, string nomeMaeDigitado) {
         int pos;
         fstream arq;
+        istringstream input{};
         arq.open(arquivo.c_str(), fstream::in);
         string nome_, corOlhos_, nomeMae_, nomePai_, sexo_, idade_;
-        cin >> nome_;
         if (arq.is_open()) {
-            string leu;
-            for (int i = 0; i < arquivo.size(); i++) {
-                if () {
-                    getline(arq, leu);
-                    cout << leu << endl;
+            string linha;
+//            for (linha; getline(arq, linha);)
+            while(!arq.eof())
+            {
+
+                getline(arq, nome_, '\t');
+                getline(arq, sexo_, '\t');
+                getline(arq, idade_, '\t');
+                getline(arq, corOlhos_, '\t');
+                getline(arq, nomePai_, '\t');
+                getline(arq, nomeMae_, '\n');
+
+                cout << nome_;
+                cout << sexo_;
+                cout << idade_;
+                cout << corOlhos_;
+                cout << nomePai_;
+                cout << nomeMae_ << endl;
+
+                if (nomePai_ == nomePaiDigitado) {
+                    cout << "Nome: " << nome_ << endl;
+                    cout << "Idade: " << idade_ << endl;
+
                 }
             }
         } else {
@@ -160,7 +178,7 @@ int main() {
                 cin >> sexoFilho;
                 cout << "Informe a idade do filho: ";
                 cin >> idadeFilho;
-                arvore->lerArquivo(arquivo);
+                arvore->lerArquivo(arquivo, nomePai, nomeMae);
                 break;
             case 2:
                 break;

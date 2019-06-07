@@ -1,5 +1,5 @@
 Nome	Sexo	Idade	Olhos	Pai	Mae
-Gabriel	M	89	Verde		
+Gabriel	M	89	Verde	
 Luisa	F	88	Azul		
 Pablo	M	91	Castanho		
 Isis	F	92	Verde		
