@@ -1,0 +1,31 @@
+Nome	Sexo	Idade	Olhos	Pai	Mae
+Gabriel	M	89	Verde		
+Luisa	F	88	Azul		
+Pablo	M	91	Castanho		
+Isis	F	92	Verde		
+Caio	M	72	Verde		
+Aquiles	M	65	Azul	Gabriel	Luisa
+Melissa	F	67	Verde	Gabriel	Luisa
+Estela	F	61	Azul	Gabriel	Luisa
+Marcos	M	66	Castanho		
+Natalia	F	69	Verde		
+Artur	M	68	Castanho		
+Isabela	F	70	Verde		
+Vitor	M	63	Verde	Pablo	Isis
+Guilherme	M	68	Verde	Pablo	Isis
+Clara	F	64	Castanho		
+Larissa	F	32	Verde	Caio	Melissa
+Diego	M	37	Verde	Caio	Melissa
+Otavio	M	42	Verde	Caio	Melissa
+Agata	F	35	Castanho	Marcos	Natalia
+Aline	F	31	Castanho	Marcos	Natalia
+Mariana	F	37	Castanho	Artur	Isabela
+Tomas	M	40	Castanho	Artur	Isabela
+Felipe	M	42	Verde	Artur	Isabela
+Alice	F	45	Verde	Guilherme	Clara
+Bianca	F	43	Castanho	Guilherme	Clara
+Valentim	M	9	Castanho	Otavio	Agata
+Maria	F	6	Castanho	Otavio	Agata
+Debora	F	1	Verde	Otavio	Agata
+Marcelo	M	21	Verde	Felipe	Alice
+Cesar	M	17	Verde	Felipe	Alice
