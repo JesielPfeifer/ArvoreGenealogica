@@ -3,6 +3,8 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -34,16 +36,55 @@ public:
         this->corOlhos = corOlhos;
     }
 
-    Pessoa *geraPessoa(string nome, TSexo sexo, int idade, Pessoa *pai);
+    Pessoa *geraPessoa(string nome, TSexo sexo, int idade, Pessoa *pai) {
+        srand(time(NULL));
+        int valorRandom = rand() % 2 + 1;
+        if ((this->getSexoStr() == "Feminino") && (pai->getCorOlhosStr() == "Masculino")) {
+            if ((this->getCorOlhosStr() == "Castanho") || (pai->getCorOlhosStr() == "Castanho")) {
+                Pessoa *filho = new Pessoa();
+            } else if ((this->getCorOlhosStr() == "Verde") && (pai->getCorOlhosStr() == "Verde")) {
+                Pessoa *filho = new Pessoa();
+                return filho;
+            } else if ((this->getCorOlhosStr() == "Azul") && (pai->getCorOlhosStr() == "Azul")) {
+                Pessoa *filho = new Pessoa();
+                return filho;
+            } else if (((this->getCorOlhosStr() == "Verde") && (pai->getCorOlhosStr() == "Azul")) ||
+                       ((this->getCorOlhosStr() == "Azul") && (pai->getCorOlhosStr() == "Verde"))) {
+                if (valorRandom == 1) {
+                    Pessoa *filho = new Pessoa();
+                    return filho;
+                } else if (valorRandom == 2) {
+                    Pessoa *filho = new Pessoa();
+                    return filho;
+                }
+            }
+        } else {
+            cout << "Membros nao podem se reproduzir" << endl;
+            return NULL;
+        }
+    }
 
     string getNome() {
         return this->nome;
     }
 
-//    string getSexoStr() {
-//    }
+    string getSexoStr() {
+        if (this->sexo == 0) {
+            return "Masculino";
+        } else if (this->sexo == 1) {
+            return "Feminino";
+        }
+    }
 
-    string getCorOlhosStr();
+    string getCorOlhosStr() {
+        if (this->corOlhos == 0) {
+            return "Castanho";
+        } else if (this->corOlhos == 1) {
+            return "Verde";
+        } else if (this->corOlhos == 2) {
+            return "Azul";
+        }
+    }
 
     int getIdade() {
         return this->idade;
@@ -73,13 +114,18 @@ public:
         this->mae = mae;
     }
 
-//    Pessoa *getPai() {
-//
-//    }
-//
-//    Pessoa *getMae() {
-//
-//    }
+    Pessoa *getPai() {
+        return this->pai;
+    }
+
+    Pessoa *getMae() {
+        return this->mae;
+    }
+
+    string retornaSexo() {
+
+    }
+
 
     void imprimeDados();
 
@@ -90,37 +136,36 @@ class Arvore {
 private:
     vector<Pessoa *> pessoa;
 public:
-    void lerArquivo(string arquivo) {
-        int pos;
+    Pessoa *objPessoa = new Pessoa();
+
+    void lerArquivo(string arquivo, string nomePaiDigitado, string nomeMaeDigitado) {
         fstream arq;
         arq.open(arquivo.c_str(), fstream::in);
         string nome_, corOlhos_, nomeMae_, nomePai_, sexo_, idade_;
-        cin >> nome_;
+        int idadeInt, sexoInt, corOlhosInt;
         if (arq.is_open()) {
-            string leu;
-            for (int i = 0; i < arquivo.size(); i++) {
-                if () {
-                    getline(arq, leu);
-                    cout << leu << endl;
+            while (!arq.eof()) {
+                getline(arq, nome_, '\t');
+                getline(arq, sexo_, '\t');
+//                convertSexoInt(sexo_);
+                getline(arq, idade_, '\t');
+                // Usa o fluxo de string para transformar string idade para valor Inteiro
+                istringstream issIdade{idade_};
+                //Transforma string to int
+                issIdade >> idadeInt;
+                getline(arq, corOlhos_, '\t');
+                getline(arq, nomePai_, '\t');
+                getline(arq, nomeMae_, '\n');
+                //Envia para o converso para transformar em int e enviara para o Pessoa e retornar em string
+//                convertCorOlhosInt(corOlhos_);
+                if ((nome_ == nomePaiDigitado || nome_ == nomeMaeDigitado) && (idadeInt >= 18 && idadeInt <= 50)) {
+
                 }
             }
         } else {
             cout << "erro" << endl;
         }
     }
-
-//    void carregarArquivo(string arquivo) {
-//        fstream arq1;
-//        arq1.open(arquivo.c_str(), fstream::in);
-//        for (int i = 0; i < arquivo.size(); i++) {
-//            if (arq1.is_open()) {
-//                getline(arq1, arquivo);
-//                string leitura = arquivo;
-//                Arvore *arv = new Arvore();
-//                arv->lerArquivo(leitura);
-//            }
-//        }
-//    }
 };
 
 int main() {
@@ -130,8 +175,6 @@ int main() {
     Arvore *arvore = new Arvore();
 
     while (1) {
-//        arvore->carregarArquivo(arquivo);
-
         cout << "====================MENU=====================" << endl;
         cout << "\n";
         cout << "1 - Inserir pessoa na arvore genealogica" << endl;
@@ -160,7 +203,7 @@ int main() {
                 cin >> sexoFilho;
                 cout << "Informe a idade do filho: ";
                 cin >> idadeFilho;
-                arvore->lerArquivo(arquivo);
+                arvore->lerArquivo(arquivo, nomePai, nomeMae);
                 break;
             case 2:
                 break;
