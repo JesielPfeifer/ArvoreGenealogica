@@ -122,11 +122,6 @@ public:
         return this->mae;
     }
 
-    string retornaSexo() {
-
-    }
-
-
     void imprimeDados();
 
     string serializaPessoa();
@@ -142,12 +137,11 @@ public:
         fstream arq;
         arq.open(arquivo.c_str(), fstream::in);
         string nome_, corOlhos_, nomeMae_, nomePai_, sexo_, idade_;
-        int idadeInt, sexoInt, corOlhosInt;
+        int idadeInt;
         if (arq.is_open()) {
             while (!arq.eof()) {
                 getline(arq, nome_, '\t');
                 getline(arq, sexo_, '\t');
-//                convertSexoInt(sexo_);
                 getline(arq, idade_, '\t');
                 // Usa o fluxo de string para transformar string idade para valor Inteiro
                 istringstream issIdade{idade_};
@@ -156,10 +150,9 @@ public:
                 getline(arq, corOlhos_, '\t');
                 getline(arq, nomePai_, '\t');
                 getline(arq, nomeMae_, '\n');
-                //Envia para o converso para transformar em int e enviara para o Pessoa e retornar em string
-//                convertCorOlhosInt(corOlhos_);
-                if ((nome_ == nomePaiDigitado || nome_ == nomeMaeDigitado) && (idadeInt >= 18 && idadeInt <= 50)) {
 
+                if ((nome_ == nomePaiDigitado || nome_ == nomeMaeDigitado) && (idadeInt >= 18 && idadeInt <= 50)) {
+                    Pessoa *filho = new Pessoa(nomePaiDigitado, sexo);
                 }
             }
         } else {
