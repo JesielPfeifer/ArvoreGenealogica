@@ -38,26 +38,20 @@ public:
 
     Pessoa *geraPessoa(string nome, TSexo sexo, int idade, Pessoa *pai) {
         srand(time(NULL));
+
+        TCorOlhos cor;
         int valorRandom = rand() % 2 + 1;
-        if ((this->getSexoStr() == "Feminino") && (pai->getCorOlhosStr() == "Masculino")) {
+        if ((this->getSexoStr() == "Feminino") && (pai->getSexoStr() == "Masculino")) {
             if ((this->getCorOlhosStr() == "Castanho") || (pai->getCorOlhosStr() == "Castanho")) {
-                Pessoa *filho = new Pessoa();
+                cor = (TCorOlhos) 0;
             } else if ((this->getCorOlhosStr() == "Verde") && (pai->getCorOlhosStr() == "Verde")) {
-                Pessoa *filho = new Pessoa();
-                return filho;
+                cor = (TCorOlhos) 1;
             } else if ((this->getCorOlhosStr() == "Azul") && (pai->getCorOlhosStr() == "Azul")) {
-                Pessoa *filho = new Pessoa();
-                return filho;
-            } else if (((this->getCorOlhosStr() == "Verde") && (pai->getCorOlhosStr() == "Azul")) ||
-                       ((this->getCorOlhosStr() == "Azul") && (pai->getCorOlhosStr() == "Verde"))) {
-                if (valorRandom == 1) {
-                    Pessoa *filho = new Pessoa();
-                    return filho;
-                } else if (valorRandom == 2) {
-                    Pessoa *filho = new Pessoa();
-                    return filho;
-                }
+                cor = (TCorOlhos) 2;
+            } else {
+                cor = (TCorOlhos) valorRandom;
             }
+            Pessoa *filho = new Pessoa(nome, sexo, idade, cor, pai, this);
         } else {
             cout << "Membros nao podem se reproduzir" << endl;
             return NULL;
@@ -71,7 +65,7 @@ public:
     string getSexoStr() {
         if (this->sexo == 0) {
             return "Masculino";
-        } else if (this->sexo == 1) {
+        } else {
             return "Feminino";
         }
     }
@@ -81,7 +75,7 @@ public:
             return "Castanho";
         } else if (this->corOlhos == 1) {
             return "Verde";
-        } else if (this->corOlhos == 2) {
+        } else {
             return "Azul";
         }
     }
@@ -98,8 +92,40 @@ public:
         this->sexo = sexo;
     }
 
+//Overcharge do setSexo() para fazer o mesmo funcionar recebendo
+// inteiro e transformando brutalmente/hardcode/forçadamente
+// em uma variável do tipo TSexo
+
+    void setSexo(int sexoInt) {
+        TSexo sexo = (TSexo) sexoInt;
+        this->setSexo(sexo);
+    }
+
+    TSexo getSexoFilho(string sexo) {
+        TSexo sex;
+        if (sexo == "Masculino") {
+            sex = (TSexo) 0;
+        } else {
+            sex = (TSexo) 1;
+        }
+        return sex;
+    }
+
     void setCorOlhos(TCorOlhos corOlhos) {
         this->corOlhos = corOlhos;
+    }
+
+    void setCorOlhos(string corOlhosStr) {
+        int cor;
+        if (corOlhosStr == "Castanho") {
+            cor = 0;
+        } else if (corOlhosStr == "Verde") {
+            cor = 1;
+        } else if (corOlhosStr == "Azul") {
+            cor = 2;
+        }
+        TCorOlhos corOlhos = (TCorOlhos) cor;
+        this->setCorOlhos(corOlhos);
     }
 
     void setIdade(int idade) {
@@ -122,7 +148,13 @@ public:
         return this->mae;
     }
 
-    void imprimeDados();
+    void imprimeDados() {
+        cout << "Nome do pai: " << pai->getNome() << endl;
+        cout << "Nome da mae: " << mae->getNome() << endl;
+        cout << "Nome do filho: " << this->getNome() << endl;
+        cout << "Cor dos olhos: " << this->getCorOlhosStr() << endl;
+        cout << "Sexo: " << this->getSexoStr();
+    }
 
     string serializaPessoa();
 };
@@ -131,34 +163,124 @@ class Arvore {
 private:
     vector<Pessoa *> pessoa;
 public:
-    Pessoa *objPessoa = new Pessoa();
-
-    void lerArquivo(string arquivo, string nomePaiDigitado, string nomeMaeDigitado) {
+    void lerArquivo(string arquivo) {
         fstream arq;
         arq.open(arquivo.c_str(), fstream::in);
-        string nome_, corOlhos_, nomeMae_, nomePai_, sexo_, idade_;
-        int idadeInt;
+        string nome, corOlhos, nomeMae, nomePai, sexo, idade;
+        int idadeInt, sexoInt;
         if (arq.is_open()) {
-            while (!arq.eof()) {
-                getline(arq, nome_, '\t');
-                getline(arq, sexo_, '\t');
-                getline(arq, idade_, '\t');
-                // Usa o fluxo de string para transformar string idade para valor Inteiro
-                istringstream issIdade{idade_};
-                //Transforma string to int
-                issIdade >> idadeInt;
-                getline(arq, corOlhos_, '\t');
-                getline(arq, nomePai_, '\t');
-                getline(arq, nomeMae_, '\n');
-
-                if ((nome_ == nomePaiDigitado || nome_ == nomeMaeDigitado) && (idadeInt >= 18 && idadeInt <= 50)) {
-                    Pessoa *filho = new Pessoa(nomePaiDigitado, sexo);
+            string s;
+            getline(arq, s);
+            if (s != "Nome\tSexo\tIdade\tOlhos\tPai\tMae\n") {
+                while (!arq.eof()) {
+                    getline(arq, nome, '\t');
+                    //if linha atual == 0 pula para proxima
+                    getline(arq, sexo, '\t');
+                    istringstream issSexo{sexo};
+                    issSexo >> sexoInt;
+                    getline(arq, idade, '\t');
+                    // Usa o fluxo de string para transformar string idade para valor Inteiro
+                    istringstream issIdade{idade};
+                    //Transforma string to int
+                    issIdade >> idadeInt;
+                    getline(arq, corOlhos, '\t');
+                    getline(arq, nomePai, '\t');
+                    getline(arq, nomeMae, '\n');
+                    setDadosPessoas(nome, sexoInt, idadeInt, sexo, corOlhos, nomePai, nomeMae);
                 }
             }
         } else {
-            cout << "erro" << endl;
+            cout << "Erro ao abrir" << endl;
         }
     }
+
+    void setDadosPessoas(string nome, int sexoInt, int idadeInt, string sexo, string corOlhos, string nomePai,
+                         string nomeMae) {
+        Pessoa *objPessoa = new Pessoa();
+        objPessoa->setNome(nome);
+        objPessoa->setSexo(sexoInt);
+        objPessoa->setIdade(idadeInt);
+        objPessoa->setCorOlhos(corOlhos);
+        if (nomePai != "") {
+            for (int i = 0; i < pessoa.size(); i++) {
+                if (pessoa[i]->getNome() == nomePai) {
+                    objPessoa->setPai(pessoa[i]);
+                } else {
+                    break;
+                }
+            }
+        }
+        if (nomeMae != "") {
+            for (int i = 0; i < pessoa.size(); i++) {
+                if (pessoa[i]->getNome() == nomeMae) {
+                    objPessoa->setMae(pessoa[i]);
+                } else {
+                    break;
+                }
+            }
+        }
+        pessoa.push_back(objPessoa);
+        delete objPessoa;
+    }
+
+    void adicionaPessoa(string nomeP, string nomeM, string nomeF, string sexoF, int idadeFilho) {
+        bool pVector = ParentVector(nomeP);
+        bool mVector = ParentVector(nomeM);
+        bool idadePai = ParentAge(nomeP);
+        bool idadeMae = ParentAge(nomeM);
+
+        cout << pVector;
+        cout << mVector;
+        cout << idadePai;
+        cout << idadeMae;
+        cout << endl;
+
+        Pessoa *pai;
+        if (pVector && mVector && idadePai && idadeMae) {
+            for (int i = 0; i < pessoa.size(); i++) {
+                if (pessoa[i]->getNome() == nomeP) {
+                    pai = pessoa[i];
+                } else {
+                    break;
+                }
+            }
+            for (int i = 0; i < pessoa.size(); i++) {
+                if (pessoa[i]->getNome() == nomeM) {
+                    pessoa.push_back(pessoa[i]->geraPessoa(nomeF, pessoa[i]->getSexoFilho(sexoF), idadeFilho, pai));
+                }
+            }
+            delete pai;
+        } else {
+            cout << "Pais nao possuem requisitos para terem filhos" << endl;
+        }
+    }
+
+    bool ParentVector(string nome) {
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (pessoa[i]->getNome() == nome) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool ParentAge(string nome) {
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (pessoa[i]->getNome() == nome && pessoa[i]->getIdade() >= 18 && pessoa[i]->getIdade() <= 50) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    string getPessoaVector() {
+        string s = "";
+        for (int i = 0; i < pessoa.size(); i++) {
+            s += pessoa[i]->getNome();
+        }
+        return s;
+    }
+
 };
 
 int main() {
@@ -166,7 +288,7 @@ int main() {
     string nomePai, nomeMae, nomeFilho, sexoFilho;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
-
+    arvore->lerArquivo(arquivo);
     while (1) {
         cout << "====================MENU=====================" << endl;
         cout << "\n";
@@ -186,7 +308,7 @@ int main() {
             case 1:
                 cout << "================PREENCHA OS DADOS=================" << endl;
                 cout << "\n";
-                cout << "Informe o nome do pai: ";
+                cout << "Informe o nome d+_o pai: ";
                 cin >> nomePai;
                 cout << "Informe o nome da mae: ";
                 cin >> nomeMae;
@@ -196,7 +318,8 @@ int main() {
                 cin >> sexoFilho;
                 cout << "Informe a idade do filho: ";
                 cin >> idadeFilho;
-                arvore->lerArquivo(arquivo, nomePai, nomeMae);
+                arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho);
+                arvore->getPessoaVector();
                 break;
             case 2:
                 break;
