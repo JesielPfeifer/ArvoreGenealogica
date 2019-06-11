@@ -5,7 +5,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-//alo
+
 using namespace std;
 
 class Pessoa {
@@ -93,8 +93,8 @@ public:
     }
 
 //Overcharge do setSexo() para fazer o mesmo funcionar recebendo
-// inteiro e transformando brutalmente/hardcode/for√ßadamente
-// em uma vari√°vel do tipo TSexo
+// inteiro e transformando brutalmente/hardcode/forÁadamente
+// em uma vari·vel do tipo TSexo
 
     void setSexo(int sexoInt) {
         TSexo sexo = (TSexo) sexoInt;
@@ -241,6 +241,7 @@ public:
             if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
                 Pessoa *mae = pessoa[mVector];
+                cout<<mae->getSexoFilho(sexoF)<<endl;
 
                 pessoa.push_back(mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai));
                 msg = "Filho "+nomeF+" gerado com sucesso";
@@ -253,7 +254,7 @@ public:
     }
 
     int ParentVector(string nome) {
-        for (int i  = 0; i < pessoa.size(); i++) {
+        for (int i = 0; i < pessoa.size(); i++) {
             if (pessoa[i]->getNome() == nome) {
                 return i;
             }
@@ -276,10 +277,68 @@ public:
         }
         return s;
     }
-    int getVectorSize() {
+
+    int getTotalPessoas() {
         return pessoa.size();
     }
 
+    int totalSexo(string sexo) {
+        int total=0;
+        for(int i=0; i<pessoa.size(); i++) {
+            cout<<pessoa[i]->getSexoStr()<<endl;
+            if(pessoa[i]->getSexoStr() == sexo) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    int toPorcentagem(float p) {
+        int porCent = 0;
+        for (int i = 0; i <= 100; i += 5) {
+            if (p < (i + 2.5)) {
+                porCent = i / 5;
+                break;
+            }
+        }
+        return porCent;
+    }
+
+    void toGrafico(int multi5) {
+        for (int i = 0; i < 20; i++) {
+            if (multi5 > i) {
+                printf("=");
+            } else {
+                printf(".");
+            }
+        }
+    }
+
+    void graficoSexo() {
+        int tMasc = totalSexo("Masculino");
+        int tFem  = totalSexo("Feminino");
+        int total = getTotalPessoas();
+
+        float porcentMasc = (100.0 * tMasc) / total;
+        int pMasc = toPorcentagem(porcentMasc);
+
+        float porcentFem = (100.0 * tFem) / total;
+        int pFem = toPorcentagem(porcentFem);
+
+        printf("Homens:\t\t%3d - \t%5.1f%% [", tMasc, porcentMasc);
+        toGrafico(pMasc);
+        printf("]\n");
+        printf("Mulheres:\t%3d - \t%5.1f%% [", tFem, porcentFem);
+        toGrafico(pFem);
+        printf("]\n");
+
+    }
+
+    void graficoIdade(){
+    }
+
+    void graficoOlhos(){
+    }
 };
 
 int main() {
@@ -319,8 +378,6 @@ int main() {
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
-
-            cout << arvore->getVectorSize() << endl;
             break;
         case 2:
             break;
@@ -331,6 +388,13 @@ int main() {
         case 5:
             break;
         case 6:
+
+            arvore->graficoSexo();
+            arvore->graficoIdade();
+            arvore->graficoOlhos();
+
+            system("PAUSE");
+
             break;
         case 7:
             break;
