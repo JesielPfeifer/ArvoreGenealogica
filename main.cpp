@@ -5,7 +5,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-
+//alo
 using namespace std;
 
 class Pessoa {
