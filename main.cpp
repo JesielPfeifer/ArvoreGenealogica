@@ -166,7 +166,7 @@ public:
     void lerArquivo(string arquivo) {
         fstream arq;
         arq.open(arquivo.c_str(), fstream::in);
-        string nome, corOlhos, nomeMae, nomePai, sexo, idade;
+        string nome, corOlhos, nomeMae, nomePai, idade, sexo;
         int idadeInt, sexoInt;
         if (arq.is_open()) {
             string s;
@@ -176,8 +176,11 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    istringstream issSexo{sexo};
-                    issSexo >> sexoInt;
+                    if (sexo=="M"){
+                        sexoInt = 0;
+                    } else {
+                        sexoInt = 1;
+                    }
                     getline(arq, idade, '\t');
                     // Usa o fluxo de string para transformar string idade para valor Inteiro
                     istringstream issIdade{idade};
@@ -186,7 +189,7 @@ public:
                     getline(arq, corOlhos, '\t');
                     getline(arq, nomePai, '\t');
                     getline(arq, nomeMae, '\n');
-                    setDadosPessoas(nome, sexoInt, idadeInt, sexo, corOlhos, nomePai, nomeMae);
+                    setDadosPessoas(nome, sexoInt, idadeInt, corOlhos, nomePai, nomeMae);
                 }
             }
         } else {
@@ -194,7 +197,7 @@ public:
         }
     }
 
-    void setDadosPessoas(string nome, int sexoInt, int idadeInt, string sexo, string corOlhos, string nomePai,
+    void setDadosPessoas(string nome, int sexoInt, int idadeInt, string corOlhos, string nomePai,
                          string nomeMae) {
         Pessoa *objPessoa = new Pessoa();
         objPessoa->setNome(nome);
@@ -220,57 +223,50 @@ public:
             }
         }
         pessoa.push_back(objPessoa);
-        delete objPessoa;
     }
 
-    void adicionaPessoa(string nomeP, string nomeM, string nomeF, string sexoF, int idadeFilho) {
-        bool pVector = ParentVector(nomeP);
-        bool mVector = ParentVector(nomeM);
-        bool idadePai = ParentAge(nomeP);
-        bool idadeMae = ParentAge(nomeM);
+    string adicionaPessoa(string nomeP, string nomeM, string nomeF, string sexoF, int idadeFilho) {
 
-        cout << pVector;
-        cout << mVector;
-        cout << idadePai;
-        cout << idadeMae;
-        cout << endl;
+        string msg="";
 
-        Pessoa *pai;
-        if (pVector && mVector && idadePai && idadeMae) {
-            for (int i = 0; i < pessoa.size(); i++) {
-                if (pessoa[i]->getNome() == nomeP) {
-                    pai = pessoa[i];
-                } else {
-                    break;
-                }
-            }
-            for (int i = 0; i < pessoa.size(); i++) {
-                if (pessoa[i]->getNome() == nomeM) {
-                    pessoa.push_back(pessoa[i]->geraPessoa(nomeF, pessoa[i]->getSexoFilho(sexoF), idadeFilho, pai));
-                }
-            }
-            delete pai;
+        int pVector = ParentVector(nomeP);
+        int mVector = ParentVector(nomeM);
+
+        if (pVector < 0 || mVector < 0) {
+            msg = "Pais nao estao no vector";
         } else {
-            cout << "Pais nao possuem requisitos para terem filhos" << endl;
+            bool idadePai = ParentAge(pVector);
+            bool idadeMae = ParentAge(mVector);
+
+            if (idadePai && idadeMae) {
+                Pessoa *pai = pessoa[pVector];
+                Pessoa *mae = pessoa[mVector];
+
+                pessoa.push_back(mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai));
+                msg = "Filho "+nomeF+" gerado com sucesso";
+            } else {
+                msg = "Pais nao possuem idade necessaria para gerar um filho";
+            }
         }
+
+        return msg;
     }
 
-    bool ParentVector(string nome) {
-        for (int i = 0; i < pessoa.size(); i++) {
+    int ParentVector(string nome) {
+        for (int i  = 0; i < pessoa.size(); i++) {
             if (pessoa[i]->getNome() == nome) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
-    bool ParentAge(string nome) {
-        for (int i = 0; i < pessoa.size(); i++) {
-            if (pessoa[i]->getNome() == nome && pessoa[i]->getIdade() >= 18 && pessoa[i]->getIdade() <= 50) {
-                return true;
-            }
+    bool ParentAge(int i) {
+        bool ret = false;
+        if (pessoa[i]->getIdade() >= 18 && pessoa[i]->getIdade() <= 50) {
+            ret = true;
         }
-        return false;
+        return ret;
     }
 
     string getPessoaVector() {
@@ -279,6 +275,9 @@ public:
             s += pessoa[i]->getNome();
         }
         return s;
+    }
+    int getVectorSize() {
+        return pessoa.size();
     }
 
 };
@@ -304,39 +303,41 @@ int main() {
         cout << "=============================================" << endl;
         cout << "Escolha uma opcao: ";
         cin >> opcao;
+        system("cls");
         switch (opcao) {
-            case 1:
-                cout << "================PREENCHA OS DADOS=================" << endl;
-                cout << "\n";
-                cout << "Informe o nome d+_o pai: ";
-                cin >> nomePai;
-                cout << "Informe o nome da mae: ";
-                cin >> nomeMae;
-                cout << "Informe o nome do filho: ";
-                cin >> nomeFilho;
-                cout << "Informe o sexo do filho: ";
-                cin >> sexoFilho;
-                cout << "Informe a idade do filho: ";
-                cin >> idadeFilho;
-                arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho);
-                arvore->getPessoaVector();
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            default:
-                cout << "Opcao invalida" << endl;
+        case 1:
+            cout << "================PREENCHA OS DADOS=================" << endl;
+            cout << "\n";
+            cout << "Informe o nome do pai: ";
+            cin >> nomePai;
+            cout << "Informe o nome da mae: ";
+            cin >> nomeMae;
+            cout << "Informe o nome do filho: ";
+            cin >> nomeFilho;
+            cout << "Informe o sexo do filho: ";
+            cin >> sexoFilho;
+            cout << "Informe a idade do filho: ";
+            cin >> idadeFilho;
+            cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
+
+            cout << arvore->getVectorSize() << endl;
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
+        default:
+            cout << "Opcao invalida" << endl;
 
         }
     }
