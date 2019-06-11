@@ -5,7 +5,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-//alo
+
 using namespace std;
 
 class Pessoa {
@@ -93,8 +93,8 @@ public:
     }
 
 //Overcharge do setSexo() para fazer o mesmo funcionar recebendo
-// inteiro e transformando brutalmente/hardcode/for√ßadamente
-// em uma vari√°vel do tipo TSexo
+// inteiro e transformando brutalmente/hardcode/forÁadamente
+// em uma vari·vel do tipo TSexo
 
     void setSexo(int sexoInt) {
         TSexo sexo = (TSexo) sexoInt;
@@ -162,6 +162,7 @@ public:
 class Arvore {
 private:
     vector<Pessoa *> pessoa;
+
 public:
     void lerArquivo(string arquivo) {
         fstream arq;
@@ -176,7 +177,7 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    if (sexo=="M"){
+                    if (sexo=="M") {
                         sexoInt = 0;
                     } else {
                         sexoInt = 1;
@@ -280,6 +281,20 @@ public:
         return pessoa.size();
     }
 
+    void consultaPessoa(string nomeDigitado) {
+        for(int i = 0; i < pessoa.size(); i++) {
+            if(pessoa[i]->getNome() == nomeDigitado) {
+
+            pessoa[i]->imprimeDados();
+//            cout << "Idade: " << pessoa[i]->getIdade() << endl;
+//            cout << "Cor dos olhos: " << pessoa[i]->getCorOlhosStr() << endl;
+//            cout << "Sexo: " << pessoa[i]->getSexoStr() << endl;
+//            cout << "Nome do pai: " << pessoa[i]->getMae() << endl;
+//            cout << "Nome da mae: " << pessoa[i]->getMae() << endl;
+            }
+        }
+    }
+
 };
 
 int main() {
@@ -327,6 +342,8 @@ int main() {
         case 3:
             break;
         case 4:
+            cin >> nomePai;
+            arvore->consultaPessoa(nomePai);
             break;
         case 5:
             break;
