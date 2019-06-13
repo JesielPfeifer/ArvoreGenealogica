@@ -52,6 +52,7 @@ public:
                 cor = (TCorOlhos) valorRandom;
             }
             Pessoa *filho = new Pessoa(nome, sexo, idade, cor, pai, this);
+            return filho;
         } else {
             cout << "Membros nao podem se reproduzir" << endl;
             return NULL;
@@ -63,11 +64,17 @@ public:
     }
 
     string getSexoStr() {
+        string retorno="";
         if (this->sexo == 0) {
-            return "Masculino";
+            retorno = "Masculino";
         } else {
-            return "Feminino";
+            retorno = "Feminino";
         }
+        return retorno;
+    }
+
+    TSexo getSexo() {
+        return this->sexo;
     }
 
     string getCorOlhosStr() {
@@ -101,9 +108,9 @@ public:
         this->setSexo(sexo);
     }
 
-    TSexo getSexoFilho(string sexo) {
+    TSexo getSexoFilho(char sexo) {
         TSexo sex;
-        if (sexo == "Masculino") {
+        if (sexo == 'M') {
             sex = (TSexo) 0;
         } else {
             sex = (TSexo) 1;
@@ -176,7 +183,7 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    if (sexo=="M"){
+                    if (sexo=="M") {
                         sexoInt = 0;
                     } else {
                         sexoInt = 1;
@@ -225,7 +232,33 @@ public:
         pessoa.push_back(objPessoa);
     }
 
-    string adicionaPessoa(string nomeP, string nomeM, string nomeF, string sexoF, int idadeFilho) {
+    string toCamelCase(string palavra) {
+        char c;
+        int i=0;
+        string camelCase="";
+        while (palavra[i]) {
+            c=palavra[i];
+            if(i==0) {
+                camelCase += toupper(c);
+            } else {
+                camelCase += tolower(c);
+            }
+            i++;
+        }
+        return camelCase;
+    }
+    char toCamelCase(char letra) {
+        return toupper(letra);
+    }
+
+
+    string adicionaPessoa(string nomeP, string nomeM, string nomeF, char sexoF, int idadeFilho) {
+
+        //nomep = toCamelCase(nomeP);
+        nomeP = toCamelCase(nomeP);
+        nomeM = toCamelCase(nomeM);
+        nomeF = toCamelCase(nomeF);
+        sexoF = toCamelCase(sexoF);
 
         string msg="";
 
@@ -241,9 +274,8 @@ public:
             if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
                 Pessoa *mae = pessoa[mVector];
-                cout<<mae->getSexoFilho(sexoF)<<endl;
-
-                pessoa.push_back(mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai));
+                Pessoa *filho = mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai);
+                pessoa.push_back(filho);
                 msg = "Filho "+nomeF+" gerado com sucesso";
             } else {
                 msg = "Pais nao possuem idade necessaria para gerar um filho";
@@ -285,7 +317,6 @@ public:
     int totalSexo(string sexo) {
         int total=0;
         for(int i=0; i<pessoa.size(); i++) {
-            cout<<pessoa[i]->getSexoStr()<<endl;
             if(pessoa[i]->getSexoStr() == sexo) {
                 total++;
             }
@@ -334,20 +365,107 @@ public:
 
     }
 
-    void graficoIdade(){
+    void graficoIdade() {
+        int total = getTotalPessoas();
+        int zeroVinte = 0;
+        int vUmCinquenta = 0;
+        int cUmSetenta = 0;
+        int maiorSetenta = 0;
+
+        for (int i=0; i<total; i++) {
+            int idade = this->pessoa[i]->getIdade();
+            if ( idade >= 0 && idade <= 20 ) {
+                zeroVinte++;
+            } else if ( idade > 20 && idade <= 50 ) {
+                vUmCinquenta++;
+            } else if ( idade > 50 && idade <= 70 ) {
+                cUmSetenta++;
+            } else {
+                maiorSetenta++;
+            }
+        }
+
+        float porcentZeroVinte = (100.0 * zeroVinte) / total;
+        int pZeroVinte = toPorcentagem(porcentZeroVinte);
+
+        float porcentVinteCiquenta = (100.0 * vUmCinquenta) / total;
+        int pVinteCinquenta = toPorcentagem(porcentVinteCiquenta);
+
+        float porcentCinquentaSetenta = (100.0 * cUmSetenta) / total;
+        int pCinquentaSetenta = toPorcentagem(porcentCinquentaSetenta);
+
+        float porcentSetenta = (100.0 * maiorSetenta) / total;
+        int pSetenta = toPorcentagem(porcentSetenta);
+
+        printf("[00,20]:\t%3d - \t%5.1f%% [", zeroVinte, porcentZeroVinte);
+        toGrafico(pZeroVinte);
+        printf("]\n");
+
+        printf("[21,50]:\t%3d - \t%5.1f%% [", vUmCinquenta, porcentVinteCiquenta);
+        toGrafico(pVinteCinquenta);
+        printf("]\n");
+
+        printf("[51,70]:\t%3d - \t%5.1f%% [", cUmSetenta, porcentCinquentaSetenta);
+        toGrafico(pCinquentaSetenta);
+        printf("]\n");
+
+        printf("[71, >]:\t%3d - \t%5.1f%% [", maiorSetenta, porcentSetenta);
+        toGrafico(pSetenta);
+        printf("]\n");
+
     }
 
-    void graficoOlhos(){
+    void graficoOlhos() {
+        int total = getTotalPessoas();
+
+        int verde = 0;
+        int castanho = 0;
+        int azul = 0;
+
+        for(int i=0; i<total; i++){
+            string cor = this->pessoa[i]->getCorOlhosStr();
+            if (cor=="Castanho") {
+                castanho++;
+            } else if(cor=="Verde") {
+                verde++;
+            } else {
+                azul++;
+            }
+        }
+
+        float porcentCastanho = (100.0 * castanho) / total;
+        int pCastanho = toPorcentagem(porcentCastanho);
+
+        float porcentVerde = (100.0 * verde) / total;
+        int pVerde = toPorcentagem(porcentVerde);
+
+        float porcentAzul = (100.0 * azul) / total;
+        int pAzul = toPorcentagem(porcentAzul);
+
+
+        printf("Castanho:\t%3d - \t%5.1f%% [", castanho, porcentCastanho);
+        toGrafico(pCastanho);
+        printf("]\n");
+
+        printf("Verde:\t\t%3d - \t%5.1f%% [", verde, porcentVerde);
+        toGrafico(pVerde);
+        printf("]\n");
+
+        printf("Azul:\t\t%3d - \t%5.1f%% [", azul, porcentAzul);
+        toGrafico(pAzul);
+        printf("]\n");
     }
 };
 
 int main() {
     string arquivo = "DadosPessoas.txt";
-    string nomePai, nomeMae, nomeFilho, sexoFilho;
+    string nomePai, nomeMae, nomeFilho;
+    char sexoFilho;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
     arvore->lerArquivo(arquivo);
     while (1) {
+        system("cls");
         cout << "====================MENU=====================" << endl;
         cout << "\n";
         cout << "1 - Inserir pessoa na arvore genealogica" << endl;
@@ -373,8 +491,14 @@ int main() {
             cin >> nomeMae;
             cout << "Informe o nome do filho: ";
             cin >> nomeFilho;
-            cout << "Informe o sexo do filho: ";
-            cin >> sexoFilho;
+            while(sexoFilho!='M' && sexoFilho!='F') {
+                cout << "Informe o sexo do filho ('M' ou 'F'): ";
+                cin >> sexoFilho;
+                sexoFilho = arvore->toCamelCase(sexoFilho);
+                if (sexoFilho!='M' && sexoFilho!='F') {
+                    cout << "Opcao invalida"<<endl;
+                }
+            }
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
@@ -389,10 +513,17 @@ int main() {
             break;
         case 6:
 
+            cout << "================ESTATISTICAS=================" << endl;
+            cout << "SEXO" << endl;
             arvore->graficoSexo();
+            cout<<endl;
+            cout << "IDADE" << endl;
             arvore->graficoIdade();
+            cout<<endl;
+            cout << "COR DOS OLHOS" << endl;
             arvore->graficoOlhos();
 
+            cout << "=============================================" << endl;
             system("PAUSE");
 
             break;
