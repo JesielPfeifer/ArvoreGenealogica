@@ -140,21 +140,15 @@ public:
         this->mae = mae;
     }
 
-    Pessoa* getPai() {
+    Pessoa *getPai() {
         return this->pai;
     }
 
-    Pessoa* getMae() {
+    Pessoa *getMae() {
         return this->mae;
     }
-    void imprimeDadosParents() {
-        cout << "Nome:" << this->getNome() << endl;
-        cout << "Sexo:" << this->getSexoStr() << endl;
-        cout << "Idade:" << this->getIdade() << endl;
-        cout << "Cor olhos:" << this->getCorOlhosStr() << endl;
-    }
 
-    void imprimeDadosFilho() {
+    void imprimeDados() {
         cout << "Nome do pai: " << pai->getNome() << endl;
         cout << "Nome da mae: " << mae->getNome() << endl;
         cout << "Nome do filho: " << this->getNome() << endl;
@@ -182,7 +176,7 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    if (sexo=="M") {
+                    if (sexo=="M"){
                         sexoInt = 0;
                     } else {
                         sexoInt = 1;
@@ -286,30 +280,11 @@ public:
         return pessoa.size();
     }
 
-    void consultaFamilia (string nomeParent) {
-        pessoa *mae;
-        for (int i=0; i < pessoa.size(); i++) {
-            if(pessoa[i]->getNome() == nomeParent) {
-                pessoa[i]->imprimeDadosParents();
-            }
-        }
-
-        for(int i=0; i < pessoa.size(); i++) {
-
-            if(pessoa[i]->getMae()) {
-                cout << "opa1" << endl;
-                if(pessoa[i]->getMae()->getNome() == nomeParent) {
-                    cout << "opa2" << endl;
-
-                }
-            }
-        }
-    }
 };
 
 int main() {
     string arquivo = "DadosPessoas.txt";
-    string nomePai, nomeMae, nomeFilho, sexoFilho, nomeParent;
+    string nomePai, nomeMae, nomeFilho, sexoFilho;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
     arvore->lerArquivo(arquivo);
@@ -344,6 +319,7 @@ int main() {
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
+
             cout << arvore->getVectorSize() << endl;
             break;
         case 2:
@@ -353,11 +329,6 @@ int main() {
         case 4:
             break;
         case 5:
-            cout << "=====CONSULTA DADOS DA FAMILIA=====" << endl;
-            cout << endl;
-            cout << "Digite o nome do marido ou da esposa pra consultar os dados da familia: ";
-            cin >> nomeParent;
-            arvore->consultaFamilia(nomeParent);
             break;
         case 6:
             break;
