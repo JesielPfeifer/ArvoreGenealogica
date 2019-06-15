@@ -5,7 +5,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-//alo
+
 using namespace std;
 
 class Pessoa {
@@ -140,13 +140,14 @@ public:
         this->mae = mae;
     }
 
-    Pessoa* getPai() {
+    Pessoa *getPai() {
         return this->pai;
     }
 
-    Pessoa* getMae() {
+    Pessoa *getMae() {
         return this->mae;
     }
+
     void imprimeDadosParents() {
         cout << "Nome:" << this->getNome() << endl;
         cout << "Sexo:" << this->getSexoStr() << endl;
@@ -162,7 +163,15 @@ public:
         cout << "Sexo: " << this->getSexoStr();
     }
 
-    string serializaPessoa();
+    string serializa() {
+        ostringstream oss;
+        oss << this->getNome() << '\t';
+        oss << this->getSexoStr() << '\t';
+        oss << this->getIdade() << '\t';
+        oss << this->getCorOlhosStr() << '\t';
+
+        return oss.str();
+    }
 };
 
 class Arvore {
@@ -182,7 +191,7 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    if (sexo=="M") {
+                    if (sexo == "M") {
                         sexoInt = 0;
                     } else {
                         sexoInt = 1;
@@ -233,7 +242,7 @@ public:
 
     string adicionaPessoa(string nomeP, string nomeM, string nomeF, string sexoF, int idadeFilho) {
 
-        string msg="";
+        string msg = "";
 
         int pVector = ParentVector(nomeP);
         int mVector = ParentVector(nomeM);
@@ -249,7 +258,7 @@ public:
                 Pessoa *mae = pessoa[mVector];
 
                 pessoa.push_back(mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai));
-                msg = "Filho "+nomeF+" gerado com sucesso";
+                msg = "Filho " + nomeF + " gerado com sucesso";
             } else {
                 msg = "Pais nao possuem idade necessaria para gerar um filho";
             }
@@ -259,7 +268,7 @@ public:
     }
 
     int ParentVector(string nome) {
-        for (int i  = 0; i < pessoa.size(); i++) {
+        for (int i = 0; i < pessoa.size(); i++) {
             if (pessoa[i]->getNome() == nome) {
                 return i;
             }
@@ -282,33 +291,35 @@ public:
         }
         return s;
     }
+
     int getVectorSize() {
         return pessoa.size();
     }
 
-    void consultaFamilia (string nomeParent) {
-        pessoa *mae;
-        for (int i=0; i < pessoa.size(); i++) {
-            if(pessoa[i]->getNome() == nomeParent) {
+    void consultaFamilia(string nomeParent) {
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (pessoa[i]->getNome() == nomeParent) {
                 pessoa[i]->imprimeDadosParents();
             }
         }
+    }
 
-        for(int i=0; i < pessoa.size(); i++) {
-
-            if(pessoa[i]->getMae()) {
-                cout << "opa1" << endl;
-                if(pessoa[i]->getMae()->getNome() == nomeParent) {
-                    cout << "opa2" << endl;
-
-                }
+    void salvaArquivo(string novArquivo) {
+        fstream arq;
+        arq.open(novArquivo.c_str(), fstream::out);
+        if (arq.is_open()) {
+            cout << "Salvando novos dados da arvore genealogica..." << endl;
+            for (int i = 0; i < pessoa.size(); i++) {
+                string dadosArq = pessoa[i]->serializa();
+                arq << dadosArq << endl;
             }
         }
     }
+
 };
 
 int main() {
-    string arquivo = "DadosPessoas.txt";
+    string arquivo = "DadosPessoas.txt", novArquivo;
     string nomePai, nomeMae, nomeFilho, sexoFilho, nomeParent;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
@@ -330,43 +341,48 @@ int main() {
         cin >> opcao;
         system("cls");
         switch (opcao) {
-        case 1:
-            cout << "================PREENCHA OS DADOS=================" << endl;
-            cout << "\n";
-            cout << "Informe o nome do pai: ";
-            cin >> nomePai;
-            cout << "Informe o nome da mae: ";
-            cin >> nomeMae;
-            cout << "Informe o nome do filho: ";
-            cin >> nomeFilho;
-            cout << "Informe o sexo do filho: ";
-            cin >> sexoFilho;
-            cout << "Informe a idade do filho: ";
-            cin >> idadeFilho;
-            cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
-            cout << arvore->getVectorSize() << endl;
-            break;
-        case 2:
-            break;
-        case 3:
-            break;
-        case 4:
-            break;
-        case 5:
-            cout << "=====CONSULTA DADOS DA FAMILIA=====" << endl;
-            cout << endl;
-            cout << "Digite o nome do marido ou da esposa pra consultar os dados da familia: ";
-            cin >> nomeParent;
-            arvore->consultaFamilia(nomeParent);
-            break;
-        case 6:
-            break;
-        case 7:
-            break;
-        case 8:
-            break;
-        default:
-            cout << "Opcao invalida" << endl;
+            case 1:
+                cout << "================PREENCHA OS DADOS=================" << endl;
+                cout << "\n";
+                cout << "Informe o nome do pai: ";
+                cin >> nomePai;
+                cout << "Informe o nome da mae: ";
+                cin >> nomeMae;
+                cout << "Informe o nome do filho: ";
+                cin >> nomeFilho;
+                cout << "Informe o sexo do filho: ";
+                cin >> sexoFilho;
+                cout << "Informe a idade do filho: ";
+                cin >> idadeFilho;
+                cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
+                cout << arvore->getVectorSize() << endl;
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                cout << "=====CONSULTA DADOS DA FAMILIA=====" << endl;
+                cout << endl;
+                cout << "Digite o nome da esposa pra consultar os dados da familia: ";
+                cin >> nomeParent;
+                arvore->consultaFamilia(nomeParent);
+                break;
+            case 6:
+                break;
+            case 7:
+                cout << "=====SALVANDO NOVOS DADOS DA ARVORE GENEALOGICA =====" << endl;
+                cout << endl;
+                cout << "Digite o novo nome do arquivo de destino: " << endl;
+                cin >> novArquivo;
+                arvore->salvaArquivo(novArquivo);
+                break;
+            case 8:
+                break;
+            default:
+                cout << "Opcao invalida" << endl;
 
         }
     }
