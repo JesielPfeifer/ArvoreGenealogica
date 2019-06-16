@@ -251,7 +251,6 @@ public:
         return toupper(letra);
     }
 
-
     string adicionaPessoa(string nomeP, string nomeM, string nomeF, char sexoF, int idadeFilho) {
 
         //nomep = toCamelCase(nomeP);
@@ -262,16 +261,17 @@ public:
 
         string msg="";
 
-        int pVector = ParentVector(nomeP);
-        int mVector = ParentVector(nomeM);
+        int pVector = parentVector(nomeP);
+        int mVector = parentVector(nomeM);
 
         if (pVector < 0 || mVector < 0) {
             msg = "Pais nao estao no vector";
         } else {
-            bool idadePai = ParentAge(pVector);
-            bool idadeMae = ParentAge(mVector);
-
-            if (idadePai && idadeMae) {
+            bool idadePai = parentAge(pVector);
+            bool idadeMae = parentAge(mVector);
+            if(idadeFilho<0) {
+                msg = "Idade invalida para o filho";
+            } else if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
                 Pessoa *mae = pessoa[mVector];
                 Pessoa *filho = mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai);
@@ -285,7 +285,7 @@ public:
         return msg;
     }
 
-    int ParentVector(string nome) {
+    int parentVector(string nome) {
         for (int i = 0; i < pessoa.size(); i++) {
             if (pessoa[i]->getNome() == nome) {
                 return i;
@@ -294,7 +294,7 @@ public:
         return -1;
     }
 
-    bool ParentAge(int i) {
+    bool parentAge(int i) {
         bool ret = false;
         if (pessoa[i]->getIdade() >= 18 && pessoa[i]->getIdade() <= 50) {
             ret = true;
@@ -502,6 +502,7 @@ int main() {
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
+            system("PAUSE");
             break;
         case 2:
             break;
@@ -512,7 +513,6 @@ int main() {
         case 5:
             break;
         case 6:
-
             cout << "================ESTATISTICAS=================" << endl;
             cout << "SEXO" << endl;
             arvore->graficoSexo();
@@ -522,10 +522,8 @@ int main() {
             cout<<endl;
             cout << "COR DOS OLHOS" << endl;
             arvore->graficoOlhos();
-
             cout << "=============================================" << endl;
             system("PAUSE");
-
             break;
         case 7:
             break;
@@ -533,6 +531,7 @@ int main() {
             break;
         default:
             cout << "Opcao invalida" << endl;
+            break;
 
         }
     }
