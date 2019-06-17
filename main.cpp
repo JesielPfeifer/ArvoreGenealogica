@@ -64,13 +64,24 @@ public:
     }
 
     string getSexoStr() {
-        string retorno="";
+        string retorno = "";
         if (this->sexo == 0) {
             retorno = "Masculino";
         } else {
             retorno = "Feminino";
         }
         return retorno;
+
+    }
+
+    char getSexoToChar() {
+        char sexoChar;
+        if (this->sexo == 0) {
+            sexoChar = 'M';
+        } else {
+            sexoChar = 'F';
+        }
+        return sexoChar;
     }
 
     TSexo getSexo() {
@@ -154,22 +165,29 @@ public:
     Pessoa *getMae() {
         return this->mae;
     }
-    void imprimeDadosParents() {
-        cout << "Nome:" << this->getNome() << endl;
-        cout << "Sexo:" << this->getSexoStr() << endl;
-        cout << "Idade:" << this->getIdade() << endl;
-        cout << "Cor olhos:" << this->getCorOlhosStr() << endl;
+
+    void imprimeDados() {
+        if (this->getPai()) {
+            cout << "Nome do pai: " << this->getPai()->getNome() << endl;
+        }
+        if (this->getMae()) {
+            cout << "Nome do mae: " << this->getMae()->getNome() << endl;
+        }
+        cout << "Nome: " << this->getNome() << endl;
+        cout << "Sexo: " << this->getSexoStr() << endl;
+        cout << "Idade: " << this->getIdade() << endl;
+        cout << "Cor dos Olhos: " << this->getCorOlhosStr() << endl;
     }
 
-    void imprimeDadosFilho() {
-        cout << "Nome do pai: " << pai->getNome() << endl;
-        cout << "Nome da mae: " << mae->getNome() << endl;
-        cout << "Nome do filho: " << this->getNome() << endl;
-        cout << "Cor dos olhos: " << this->getCorOlhosStr() << endl;
-        cout << "Sexo: " << this->getSexoStr();
+    string serialize() {
+        ostringstream oss;
+        oss << this->getNome() << '\t';
+        oss << this->getSexoToChar() << '\t';
+        oss << this->getIdade() << '\t';
+        oss << this->getCorOlhosStr() << '\t';
+//        oss << pai->getNome();
+        return oss.str();
     }
-
-    string serializaPessoa();
 };
 
 class Arvore {
@@ -189,7 +207,7 @@ public:
                     getline(arq, nome, '\t');
                     //if linha atual == 0 pula para proxima
                     getline(arq, sexo, '\t');
-                    if (sexo=="M"){
+                    if (sexo == "M") {
                         sexoInt = 0;
                     } else {
                         sexoInt = 1;
@@ -221,8 +239,6 @@ public:
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomePai) {
                     objPessoa->setPai(pessoa[i]);
-                } else {
-                    break;
                 }
             }
         }
@@ -230,8 +246,6 @@ public:
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomeMae) {
                     objPessoa->setMae(pessoa[i]);
-                } else {
-                    break;
                 }
             }
         }
@@ -240,11 +254,11 @@ public:
 
     string toCamelCase(string palavra) {
         char c;
-        int i=0;
-        string camelCase="";
+        int i = 0;
+        string camelCase = "";
         while (palavra[i]) {
-            c=palavra[i];
-            if(i==0) {
+            c = palavra[i];
+            if (i == 0) {
                 camelCase += toupper(c);
             } else {
                 camelCase += tolower(c);
@@ -253,6 +267,7 @@ public:
         }
         return camelCase;
     }
+
     char toCamelCase(char letra) {
         return toupper(letra);
     }
@@ -265,7 +280,7 @@ public:
         nomeF = toCamelCase(nomeF);
         sexoF = toCamelCase(sexoF);
 
-        string msg="";
+        string msg = "";
 
         int pVector = parentVector(nomeP);
         int mVector = parentVector(nomeM);
@@ -275,14 +290,14 @@ public:
         } else {
             bool idadePai = parentAge(pVector);
             bool idadeMae = parentAge(mVector);
-            if(idadeFilho<0) {
+            if (idadeFilho < 0) {
                 msg = "Idade invalida para o filho";
             } else if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
                 Pessoa *mae = pessoa[mVector];
                 Pessoa *filho = mae->geraPessoa(nomeF, mae->getSexoFilho(sexoF), idadeFilho, pai);
                 pessoa.push_back(filho);
-                msg = "Filho "+nomeF+" gerado com sucesso";
+                msg = "Filho " + nomeF + " gerado com sucesso";
             } else {
                 msg = "Pais nao possuem idade necessaria para gerar um filho";
             }
@@ -321,9 +336,9 @@ public:
     }
 
     int totalSexo(string sexo) {
-        int total=0;
-        for(int i=0; i<pessoa.size(); i++) {
-            if(pessoa[i]->getSexoStr() == sexo) {
+        int total = 0;
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (pessoa[i]->getSexoStr() == sexo) {
                 total++;
             }
         }
@@ -353,7 +368,7 @@ public:
 
     void graficoSexo() {
         int tMasc = totalSexo("Masculino");
-        int tFem  = totalSexo("Feminino");
+        int tFem = totalSexo("Feminino");
         int total = getTotalPessoas();
 
         float porcentMasc = (100.0 * tMasc) / total;
@@ -378,13 +393,13 @@ public:
         int cUmSetenta = 0;
         int maiorSetenta = 0;
 
-        for (int i=0; i<total; i++) {
+        for (int i = 0; i < total; i++) {
             int idade = this->pessoa[i]->getIdade();
-            if ( idade >= 0 && idade <= 20 ) {
+            if (idade >= 0 && idade <= 20) {
                 zeroVinte++;
-            } else if ( idade > 20 && idade <= 50 ) {
+            } else if (idade > 20 && idade <= 50) {
                 vUmCinquenta++;
-            } else if ( idade > 50 && idade <= 70 ) {
+            } else if (idade > 50 && idade <= 70) {
                 cUmSetenta++;
             } else {
                 maiorSetenta++;
@@ -428,11 +443,11 @@ public:
         int castanho = 0;
         int azul = 0;
 
-        for(int i=0; i<total; i++){
+        for (int i = 0; i < total; i++) {
             string cor = this->pessoa[i]->getCorOlhosStr();
-            if (cor=="Castanho") {
+            if (cor == "Castanho") {
                 castanho++;
-            } else if(cor=="Verde") {
+            } else if (cor == "Verde") {
                 verde++;
             } else {
                 azul++;
@@ -461,11 +476,51 @@ public:
         toGrafico(pAzul);
         printf("]\n");
     }
+
+    void consultaFamilia(string nomeDigitado) {
+        Pessoa *progenitor = new Pessoa();
+        Pessoa *filho = new Pessoa();
+
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (nomeDigitado == pessoa[i]->getNome()) {
+                progenitor = pessoa[i];
+            }
+        }
+        if (progenitor->getNome() != "") {
+            progenitor->imprimeDados();
+            for (int i = 0; i < pessoa.size(); i++) {
+                cout << pessoa[i]->getPai()->getNome();
+                cout << pessoa[i]->getMae()->getNome();
+                if (progenitor->getMae()->getNome() == nomeDigitado) {
+                    pessoa[i]->imprimeDados();
+                }
+            }
+        } else {
+            cout << "Não achou" << endl;
+        }
+        system("pause");
+    }
+
+    void salvaArquivo(string arquivo) {
+        fstream arq;
+        arq.open(arquivo.c_str(), fstream::out);
+        if (arq.is_open()) {
+            cout << "Salvando arquivo no banco de dados" << endl;
+            arq << "Nome\tSexo\tIdade\tOlhos\tPai\tMae\n";
+            for (int i = 0; i < pessoa.size(); i++) {
+                string linha = pessoa[i]->serialize();
+                arq << linha << endl;
+            }
+            cout << "Arquivos foram salvos." << endl;
+        }
+    }
+
+
 };
 
 int main() {
-    string arquivo = "DadosPessoas.txt";
-    string nomePai, nomeMae, nomeFilho;
+    string arquivo = "DadosPessoas.txt", novArquivo;
+    string nomePai, nomeMae, nomeFilho, nomeParent;
     char sexoFilho;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
@@ -497,12 +552,12 @@ int main() {
             cin >> nomeMae;
             cout << "Informe o nome do filho: ";
             cin >> nomeFilho;
-            while(sexoFilho!='M' && sexoFilho!='F') {
+            while (sexoFilho != 'M' && sexoFilho != 'F') {
                 cout << "Informe o sexo do filho ('M' ou 'F'): ";
                 cin >> sexoFilho;
                 sexoFilho = arvore->toCamelCase(sexoFilho);
-                if (sexoFilho!='M' && sexoFilho!='F') {
-                    cout << "Opcao invalida"<<endl;
+                if (sexoFilho != 'M' && sexoFilho != 'F') {
+                    cout << "Opcao invalida" << endl;
                 }
             }
             cout << "Informe a idade do filho: ";
@@ -518,7 +573,7 @@ int main() {
             break;
         case 5:
             cout << "=====CONSULTA DADOS DA FAMILIA=====" << endl;
-            cout << endl;
+            cout << '\n';
             cout << "Digite o nome do marido ou da esposa pra consultar os dados da familia: ";
             cin >> nomeParent;
             arvore->consultaFamilia(nomeParent);
@@ -527,16 +582,21 @@ int main() {
             cout << "================ESTATISTICAS=================" << endl;
             cout << "SEXO" << endl;
             arvore->graficoSexo();
-            cout<<endl;
+            cout << endl;
             cout << "IDADE" << endl;
             arvore->graficoIdade();
-            cout<<endl;
+            cout << endl;
             cout << "COR DOS OLHOS" << endl;
             arvore->graficoOlhos();
             cout << "=============================================" << endl;
             system("PAUSE");
             break;
         case 7:
+            cout << "=====SALVA NOVOS DADOS DA ARVORE GENEALOGICA=====" << endl;
+            cout << '\n';
+            cout << "Digite o novo nome do arquivo para salvar os dados: " << endl;
+            cin >> novArquivo;
+            arvore->salvaArquivo(novArquivo + ".txt");
             break;
         case 8:
             break;
