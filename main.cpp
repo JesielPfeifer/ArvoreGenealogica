@@ -215,19 +215,19 @@ public:
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomePai) {
                     objPessoa->setPai(pessoa[i]);
-                } else {
-                    break;
                 }
             }
+        } else {
+            objPessoa->setPai(NULL);
         }
         if (nomeMae != "") {
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomeMae) {
                     objPessoa->setMae(pessoa[i]);
-                } else {
-                    break;
                 }
             }
+        } else {
+            objPessoa->setMae(NULL);
         }
         pessoa.push_back(objPessoa);
     }
@@ -264,12 +264,16 @@ public:
         int pVector = parentVector(nomeP);
         int mVector = parentVector(nomeM);
 
+
         if (pVector < 0 || mVector < 0) {
             msg = "Pais nao estao no vector";
         } else {
+            bool nomeRepetido = verificaNome(nomeF);
             bool idadePai = parentAge(pVector);
             bool idadeMae = parentAge(mVector);
-            if(idadeFilho<0) {
+            if(!nomeRepetido){
+                msg = "Pessoa ja inserida no vector";
+            } else if (idadeFilho<0) {
                 msg = "Idade invalida para o filho";
             } else if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
@@ -300,6 +304,15 @@ public:
             ret = true;
         }
         return ret;
+    }
+
+    bool verificaNome(string nome) {
+        for (int i=0; i<pessoa.size(); i++) {
+            if(pessoa[i]->getNome()==nome){
+                return false;
+            }
+        }
+        return true;
     }
 
     string getPessoaVector() {
