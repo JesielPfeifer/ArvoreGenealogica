@@ -241,6 +241,8 @@ public:
                     objPessoa->setPai(pessoa[i]);
                 }
             }
+        } else {
+            objPessoa->setPai(NULL);
         }
         if (nomeMae != "") {
             for (int i = 0; i < pessoa.size(); i++) {
@@ -248,6 +250,8 @@ public:
                     objPessoa->setMae(pessoa[i]);
                 }
             }
+        } else {
+            objPessoa->setMae(NULL);
         }
         pessoa.push_back(objPessoa);
     }
@@ -478,25 +482,29 @@ public:
     }
 
     void consultaFamilia(string nomeDigitado) {
-        Pessoa *progenitor = new Pessoa();
-        Pessoa *filho = new Pessoa();
+        Pessoa *progenitor = NULL;
 
         for (int i = 0; i < pessoa.size(); i++) {
             if (nomeDigitado == pessoa[i]->getNome()) {
                 progenitor = pessoa[i];
             }
         }
-        if (progenitor->getNome() != "") {
+        if (progenitor != NULL) {
             progenitor->imprimeDados();
             for (int i = 0; i < pessoa.size(); i++) {
-                cout << pessoa[i]->getPai()->getNome();
-                cout << pessoa[i]->getMae()->getNome();
-                if (progenitor->getMae()->getNome() == nomeDigitado) {
-                    pessoa[i]->imprimeDados();
+                if(pessoa[i]->getMae() != NULL) {
+                    if (pessoa[i]->getMae()->getNome()== nomeDigitado) {
+                        pessoa[i]->imprimeDados();
+                    }
+                }
+                if(pessoa[i]->getPai() != NULL) {
+                    if (pessoa[i]->getPai()->getNome()== nomeDigitado) {
+                        pessoa[i]->imprimeDados();
+                    }
                 }
             }
         } else {
-            cout << "Não achou" << endl;
+            cout << "Não " << endl;
         }
         system("pause");
     }
