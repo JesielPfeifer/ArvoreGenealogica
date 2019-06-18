@@ -73,6 +73,16 @@ public:
         return retorno;
     }
 
+    char getSexoToChar() {
+        char sexoChar;
+        if (this->sexo == 0) {
+            sexoChar = 'M';
+        } else {
+            sexoChar = 'F';
+        }
+        return sexoChar;
+    }
+
     TSexo getSexo() {
         return this->sexo;
     }
@@ -156,14 +166,32 @@ public:
     }
 
     void imprimeDados() {
-        cout << "Nome do pai: " << pai->getNome() << endl;
-        cout << "Nome da mae: " << mae->getNome() << endl;
-        cout << "Nome do filho: " << this->getNome() << endl;
-        cout << "Cor dos olhos: " << this->getCorOlhosStr() << endl;
-        cout << "Sexo: " << this->getSexoStr();
+        if (this->getPai()) {
+            cout << "Nome do pai: " << this->getPai()->getNome() << endl;
+        }
+        if (this->getMae()) {
+            cout << "Nome do mae: " << this->getMae()->getNome() << endl;
+        }
+        cout << "Nome: " << this->getNome() << endl;
+        cout << "Sexo: " << this->getSexoStr() << endl;
+        cout << "Idade: " << this->getIdade() << endl;
+        cout << "Cor dos Olhos: " << this->getCorOlhosStr() << endl;
     }
 
-    string serializaPessoa();
+    string serialize() {
+        ostringstream oss;
+        oss << this->getNome() << '\t';
+        oss << this->getSexoToChar() << '\t';
+        oss << this->getIdade() << '\t';
+        oss << this->getCorOlhosStr() << '\t';
+        if(this->getPai()!= NULL) {
+            oss << this->getPai()->getNome() << '\t';
+        }
+        if(this->getMae()!= NULL) {
+            oss << this->getMae()->getNome();
+        }
+        return oss.str();
+    }
 };
 
 class Arvore {
@@ -215,19 +243,19 @@ public:
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomePai) {
                     objPessoa->setPai(pessoa[i]);
-                } else {
-                    break;
                 }
             }
+        } else {
+            objPessoa->setPai(NULL);
         }
         if (nomeMae != "") {
             for (int i = 0; i < pessoa.size(); i++) {
                 if (pessoa[i]->getNome() == nomeMae) {
                     objPessoa->setMae(pessoa[i]);
-                } else {
-                    break;
                 }
             }
+        } else {
+            objPessoa->setMae(NULL);
         }
         pessoa.push_back(objPessoa);
     }
@@ -267,9 +295,15 @@ public:
         if (pVector < 0 || mVector < 0) {
             msg = "Pais nao estao no vector";
         } else {
+            bool nomeRepetido = verificaNome(nomeF);
             bool idadePai = parentAge(pVector);
             bool idadeMae = parentAge(mVector);
-            if(idadeFilho<0) {
+            bool idadeValida = validateIdade(pVector, mVector, idadeFilho);
+            if(!idadeValida) {
+                msg = "Filho mais velho que os pais ou eles nao tinham a idade necessaria no momento de sua geracao.";
+            } else if(!nomeRepetido) {
+                msg = "Pessoa ja inserida no vector";
+            } else if(idadeFilho<0) {
                 msg = "Idade invalida para o filho";
             } else if (idadePai && idadeMae) {
                 Pessoa *pai = pessoa[pVector];
@@ -300,6 +334,24 @@ public:
             ret = true;
         }
         return ret;
+    }
+
+    bool verificaNome(string nome) {
+        for (int i=0; i<pessoa.size(); i++) {
+            if(pessoa[i]->getNome()==nome) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool validateIdade(int idxPai, int idxMae, int idadeFilho) {
+        int pai = pessoa[idxPai]->getIdade()-idadeFilho;
+        int mae = pessoa[idxMae]->getIdade()-idadeFilho;
+        if( pai>= 18 &&  mae>= 18) {
+            return true;
+        }
+        return false;
     }
 
     string getPessoaVector() {
@@ -422,7 +474,7 @@ public:
         int castanho = 0;
         int azul = 0;
 
-        for(int i=0; i<total; i++){
+        for(int i=0; i<total; i++) {
             string cor = this->pessoa[i]->getCorOlhosStr();
             if (cor=="Castanho") {
                 castanho++;
@@ -455,11 +507,163 @@ public:
         toGrafico(pAzul);
         printf("]\n");
     }
+
+
+    //falta mostrar conje
+    void consultaPessoa(string nomeDigitado) {
+        nomeDigitado = toCamelCase(nomeDigitado);
+        Pessoa *p = NULL;
+
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (nomeDigitado == pessoa[i]->getNome()) {
+                p = pessoa[i];
+            }
+        }
+        if (p != NULL) {
+            p->imprimeDados();
+            cout<<endl;
+        }
+    }
+
+    //falta mostrar conje
+    void consultaFamilia(string nomeDigitado) {
+        nomeDigitado= toCamelCase(nomeDigitado);
+        Pessoa *progenitor = NULL;
+
+        for (int i = 0; i < pessoa.size(); i++) {
+            if (nomeDigitado == pessoa[i]->getNome()) {
+                progenitor = pessoa[i];
+            }
+        }
+        if (progenitor != NULL) {
+            progenitor->imprimeDados();
+            cout<<endl;
+            for (int i = 0; i < pessoa.size(); i++) {
+                if(pessoa[i]->getMae() != NULL) {
+                    if (pessoa[i]->getMae()->getNome()== nomeDigitado) {
+                        pessoa[i]->imprimeDados();
+                        cout << endl;
+                    }
+                }
+                if(pessoa[i]->getPai() != NULL) {
+                    if (pessoa[i]->getPai()->getNome()== nomeDigitado) {
+                        pessoa[i]->imprimeDados();
+                        cout << endl;
+                    }
+                }
+            }
+        } else {
+            cout << "Nao encontrado." << endl;
+        }
+        system("pause");
+    }
+
+    void salvaArquivo(string arquivo) {
+        fstream arq;
+        arq.open(arquivo.c_str(), fstream::out);
+        if (arq.is_open()) {
+            cout << "Salvando arquivo no banco de dados" << endl;
+            arq << "Nome\tSexo\tIdade\tOlhos\tPai\tMae\n";
+            for (int i = 0; i < pessoa.size(); i++) {
+                string linha = pessoa[i]->serialize();
+                arq << linha << endl;
+            }
+            cout << "Arquivos foram salvos." << endl;
+        }
+    }
+
+    void removePessoa(string nomeDigitado) {
+        nomeDigitado = toCamelCase(nomeDigitado);
+        cout<<pessoa.size()<<endl;
+        for( int i=0; i<pessoa.size(); i++) {
+            if( pessoa[i]->getNome() == nomeDigitado) {
+                pessoa.erase(pessoa.begin()+i);
+                cout << "Pessoa removida com sucesso" << endl;
+            }
+
+        }
+        for(int i=0; i<pessoa.size(); i++) {
+            if (pessoa[i]->getPai() != NULL) {
+                if(nomeDigitado == pessoa[i]->getPai()->getNome()) {
+                    pessoa[i]->setPai(NULL);
+                }
+            }
+        }
+        for(int i=0; i<pessoa.size(); i++) {
+            if (pessoa[i]->getMae() != NULL) {
+                if(nomeDigitado == pessoa[i]->getMae()->getNome()) {
+                    pessoa[i]->setMae(NULL);
+                }
+            }
+        }
+        cout << pessoa.size() << endl;
+    }
+
+    void alteraCaracteristica (string nomeDigitado) {
+        nomeDigitado = toCamelCase(nomeDigitado);
+        int num, novIdade, sexo;
+        char novSexo;
+        string novCorOlhos;
+        string novNome;
+        for (int i=0; i<pessoa.size(); i++) {
+            if (nomeDigitado == pessoa[i]->getNome()) {
+                cout << "1 - Nome" << endl;
+                cout << "2 - Sexo" << endl;
+                cout << "3 - Cor dos olhos" << endl;
+                cout << "4 - Idade" << endl;
+                cout << "Digite o numero da  caracteristica que deseja modificar:";
+                cin >> num;
+
+                switch(num) {
+                case 1:
+                    cout << "Digite o novo nome:" << endl;
+                    cin >> novNome;
+                    novNome = toCamelCase(novNome);
+                    pessoa[i]->setNome(novNome);
+                    break;
+
+                case 2:
+                    while(novSexo!='M' && novSexo!='F') {
+                        cout << "Informe o novo sexo ('M' ou 'F'): ";
+                        cin >> novSexo;
+                        novSexo = toCamelCase(novSexo);
+                        if (novSexo!='M' && novSexo!='F') {
+                            cout << "Opcao invalida"<<endl;
+                        }
+                    }
+                    if (novSexo=='M') {
+                        sexo = 0;
+                    } else {
+                        sexo = 1;
+                    }
+                    pessoa[i]->setSexo(sexo);
+                    break;
+
+                case 3:
+                    cout << "Digite a nova cor dos olhos(Castanho,Verde,Azul):" << endl;
+                    cin >> novCorOlhos;
+                    novCorOlhos = toCamelCase(novCorOlhos);
+                    pessoa[i]->setCorOlhos(novCorOlhos);
+                    break;
+
+                case 4:
+                    cout << "Digite a nova idade da pessoa:" << endl;
+                    cin >> novIdade;
+                    pessoa[i]->setIdade(novIdade);
+                    break;
+
+                default:
+                    cout << "Opcao invalida" << endl;
+                }
+            }
+        }
+    }
+
 };
 
 int main() {
-    string arquivo = "DadosPessoas.txt";
-    string nomePai, nomeMae, nomeFilho;
+    string arquivo = "DadosPessoas.txt", novArquivo;
+    string nomePai, nomeMae, nomeFilho, nomeParent, nomeDig;
     char sexoFilho;
     int idadeFilho, opcao;
     Arvore *arvore = new Arvore();
@@ -502,18 +706,45 @@ int main() {
             cout << "Informe a idade do filho: ";
             cin >> idadeFilho;
             cout << arvore->adicionaPessoa(nomePai, nomeMae, nomeFilho, sexoFilho, idadeFilho) << endl;
+            cout << "===============================================" << endl;
             system("PAUSE");
             break;
         case 2:
+            cout << "================REMOVER PESSOA=================" << endl;
+            cout << "Escreva o nome da pessoa que deseja remover do vector: ";
+            cin >> nomeDig;
+            arvore->removePessoa(nomeDig);
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         case 3:
+            cout << "================EDITAR PESSOA==================" << endl;
+            cout << "Digite o nome da pessoa que desejesa modificar: ";
+            cin >> nomeDig;
+            arvore->alteraCaracteristica(nomeDig);
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         case 4:
+            cout << "================CONSULTAR PESSOA===============" << endl;
+            cout << "Digite o nome da pessoa que deseja ver as caracteristicas: ";
+            cin >> nomeDig;
+            arvore->consultaPessoa(nomeDig);
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         case 5:
+            cout << "===========CONSULTA DADOS DA FAMILIA===========" << endl;
+            cout << '\n';
+            cout << "Digite o nome do marido ou da esposa pra consultar os dados da familia: ";
+            cin >> nomeParent;
+            arvore->consultaFamilia(nomeParent);
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         case 6:
-            cout << "================ESTATISTICAS=================" << endl;
+            cout << "==================ESTATISTICAS=================" << endl;
+            cout << '\n';
             cout << "SEXO" << endl;
             arvore->graficoSexo();
             cout<<endl;
@@ -522,12 +753,22 @@ int main() {
             cout<<endl;
             cout << "COR DOS OLHOS" << endl;
             arvore->graficoOlhos();
-            cout << "=============================================" << endl;
+            cout << "===============================================" << endl;
             system("PAUSE");
             break;
         case 7:
+            cout << "====SALVA NOVOS DADOS DA ARVORE GENEALOGICA====" << endl;
+            cout << '\n';
+            cout << "Digite o novo nome do arquivo para salvar os dados: " << endl;
+            cin >> novArquivo;
+            arvore->salvaArquivo(novArquivo + ".txt");
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         case 8:
+            cout << "===============================================" << endl;
+            cout << "===============================================" << endl;
+            system("PAUSE");
             break;
         default:
             cout << "Opcao invalida" << endl;
