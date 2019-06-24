@@ -418,15 +418,14 @@ public:
 
     int parentVector(string nome)
     {
-        int i=0;
+        int i = 0;
         for (vector<Pessoa *>::iterator it=pessoa.begin(); it != pessoa.end(); it++)
         {
-//            cout << (*it)->getNome() << endl;
-            i++;
             if((*it)->getNome() == nome)
             {
                 return i;
             }
+            i++;
         }
         return -1;
     }
