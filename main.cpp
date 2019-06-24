@@ -774,6 +774,8 @@ public:
 
     void removePessoa(string nomeDigitado)
     {
+        int flag = 0;
+
         nomeDigitado = toCamelCase(nomeDigitado);
         for( int i=0; i<pessoa.size(); i++)
         {
@@ -781,8 +783,13 @@ public:
             {
                 pessoa.erase(pessoa.begin()+i);
                 cout << "Pessoa " << nomeDigitado << " removida com sucesso" << endl;
+                flag = 1;
             }
 
+        }
+        if(flag == 0)
+        {
+            cout << "Pessoa digitada nao esta no vector" << endl;
         }
         for(int i=0; i<pessoa.size(); i++)
         {
